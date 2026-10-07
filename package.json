@@ -1,0 +1,17 @@
+{
+  "name": "payguard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Agentic Spending Firewall for PayPal MCP",
+  "scripts": {
+    "dev": "pnpm --filter @payguard/proxy dev",
+    "dev:bot": "pnpm --filter @payguard/telegram-bot dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "demo": "pnpm --filter @payguard/proxy demo"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  proxy:
+    build:
+      context: .
+      dockerfile: packages/proxy/Dockerfile
+    ports:
+      - "3100:3100"
+    env_file:
+      - .env
+    restart: unless-stopped
