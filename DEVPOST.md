@@ -85,3 +85,24 @@ We built a fully functional agentic commerce security layer in under 48 hours th
 | **1:45–2:05** | **Scene 3** animates into AG Grid (Red `BLOCKED`) | *"Scene three: a known phishing vendor tries to charge $25 for a fake 'account verification fee.' PayGuard's vendor trust score blocks it instantly — no human approval needed."* |
 | **2:05–2:25** | Zoom to full AG Grid console & stat cards | *"Every transaction, every policy decision, every approval — all visible in real time on the AG Grid security dashboard. This is the missing layer in agentic commerce."* |
 | **2:25–2:30** | Logo + Tagline card | *"PayGuard. AP2 proves the agent signed it. We prove the agent should have."* |
+
+---
+
+## 9. Judge Q&A Cheat Sheet (Prepared Answers)
+
+* **Q1: How is this different from existing fraud detection?**
+  > *"Traditional fraud detection runs after a transaction is submitted and looks at user transaction history. PayGuard runs before the transaction reaches PayPal, at the MCP protocol layer, and enforces policy based on agent behavior. We're not detecting credit card fraud; we're preventing agent manipulation."*
+
+* **Q2: How do you actually detect prompt injection?**
+  > *"Today, we enforce semantic heuristic rules — amount thresholds, velocity, vendor trust scoring. These catch the financial outcomes of manipulation. The architecture is modular so we can plug in LLM-based reasoning analysis as that technology matures. What we've solved is the protocol interception and policy enforcement layer, which is the missing piece regardless of detection method."*
+
+* **Q3: Why would PayPal need this when they have AP2?**
+  > *"AP2 is a cryptographic signing standard. It proves an agent authorized a payment. It doesn't prove the agent should have. PayGuard is the policy layer that AP2 doesn't try to be — and PayPal has publicly stated that safe agentic commerce is an active research priority."*
+
+* **Q4: How does this scale beyond three policy rules?**
+  > *"The policy engine is schema-driven. Each rule is an isolated function that returns a verdict and risk score. Adding rules — category restrictions, time-of-day limits, geo-fencing — is a 20-line change. The hard part was the MCP interception and async approval queue, which is complete."*
+
+* **Q5: What's your business model?**
+  > *"Three paths: SaaS for consumer AI agent builders ($X/month per agent), enterprise licensing for marketplaces running agent-driven checkout, and a developer tier. PayPal itself is the obvious partner — this naturally belongs as a native feature of their MCP offering."*
+
+

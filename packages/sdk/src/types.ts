@@ -38,3 +38,4 @@ export interface PayGuardEvaluationResult {
   paypalOrderId?: string;
   transactionId?: string;
 }
+

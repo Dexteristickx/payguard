@@ -18,15 +18,16 @@ PayGuard is an Agentic Spending Firewall for PayPal MCP built for the PayPal AI 
 - [x] Block 4A: Devpost submission write-up (`DEVPOST.md`) with 2.5-min video script & timecodes
 - [x] Block 4B: Demo video script & presentation choreography mapped
 - [x] Block 4C: OpenAPI 3.0.3 spec (`/v1/openapi.json`) & `@payguard/sdk` client package scaffolded and compiled
-- [ ] Block 4D: Live Telegram bot token link & recording final video
+- [x] Block 4D: Prepare 5 Judge Q&A responses, 72-hour countdown checklist & execution playbook
+- [/] Final Polish: Record 2.5-min demo video, capture dashboard screenshots/GIFs, and submit to Devpost
 
 ## Key Files & Recent Modifications
-- `README.md`: Comprehensive open-source documentation with architecture diagram, quickstart, and sponsor details
-- `DEVPOST.md`: Ready-to-submit Devpost application content with video script and timecodes
+- `README.md`: Complete open-source documentation with architecture diagram, quickstart, and sponsor details
+- `DEVPOST.md`: Ready-to-submit Devpost application content with full video script, timecodes, and Q&A answers
 - `packages/sdk/`: Client SDK package with `PayGuardClient`, types, and `openapi.json` for APIMatic
-- `packages/proxy/src/index.ts`: Added `/v1/openapi.json` spec endpoint and `/v1/demo/run` route
-- `packages/dashboard/`: AG Grid Community v33 dark-mode console running on `http://localhost:5173`
+- `packages/proxy/src/index.ts`: Fastify MCP gateway running with `/v1/openapi.json` and in-browser `/v1/demo/run`
+- `packages/dashboard/`: AG Grid Community v33 console running live on `http://localhost:5173`
 
 ## Next Immediate Action
-Connect live `TELEGRAM_BOT_TOKEN` in `.env` (optional, takes 2 mins with `@BotFather`), record the 2.5-minute demo video following `DEVPOST.md`, and submit to Devpost!
+Record the 2.5-minute demo video following the choreography in `DEVPOST.md`, capture screenshots of the AG Grid console, and submit before the deadline.
 
