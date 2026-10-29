@@ -43,11 +43,16 @@ export interface DashboardEvent {
 }
 
 export interface DashboardStats {
+  total: number;
   totalCount: number;
   totalVolume: number;
+  blocked: number;
   blockedCount: number;
+  held: number;
   heldCount: number;
+  completed: number;
   approvedCount: number;
+  avgRisk: number;
   avgRiskScore: number;
 }
 

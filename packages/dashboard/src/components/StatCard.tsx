@@ -1,71 +1,47 @@
-import React from "react";
-import type { LucideIcon } from "lucide-react";
-
 interface StatCardProps {
-  title: string;
+  label: string;
   value: string | number;
-  subtitle?: string;
-  icon: LucideIcon;
-  variant?: "blue" | "emerald" | "amber" | "rose";
+  icon: string;
+  color: string;
+  glowColor: string;
+  subtext?: string;
 }
 
-export const StatCard: React.FC<StatCardProps> = ({
-  title,
+export function StatCard({
+  label,
   value,
-  subtitle,
-  icon: Icon,
-  variant = "blue",
-}) => {
-  const getVariantStyles = () => {
-    switch (variant) {
-      case "emerald":
-        return {
-          iconBg: "bg-emerald-950/50 text-emerald-400 border-emerald-800/40",
-          glow: "group-hover:border-emerald-500/30",
-        };
-      case "amber":
-        return {
-          iconBg: "bg-amber-950/50 text-amber-400 border-amber-800/40",
-          glow: "group-hover:border-amber-500/30",
-        };
-      case "rose":
-        return {
-          iconBg: "bg-rose-950/50 text-rose-400 border-rose-800/40",
-          glow: "group-hover:border-rose-500/30",
-        };
-      default:
-        return {
-          iconBg: "bg-blue-950/50 text-blue-400 border-blue-800/40",
-          glow: "group-hover:border-blue-500/30",
-        };
-    }
-  };
-
-  const { iconBg, glow } = getVariantStyles();
-
+  icon,
+  color,
+  glowColor,
+  subtext,
+}: StatCardProps) {
   return (
-    <div
-      className={`group relative bg-gray-900/80 backdrop-blur-sm border border-gray-800/80 rounded-xl p-4 transition-all duration-300 hover:shadow-lg ${glow}`}
-    >
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-          {title}
+    <div className="glass-card glass-card-hover rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden group">
+      {/* Background Ambient Glow Accent */}
+      <div
+        className="absolute -right-4 -top-4 w-20 h-20 rounded-full blur-2xl transition-all duration-500 group-hover:scale-150 opacity-60"
+        style={{ backgroundColor: glowColor }}
+      />
+
+      <div className="flex items-center justify-between relative z-10">
+        <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider font-mono">
+          {label}
         </span>
-        <div className={`p-2 rounded-lg border ${iconBg}`}>
-          <Icon className="w-4 h-4" />
+        <div className="w-8 h-8 rounded-lg bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-sm shadow-inner">
+          {icon}
         </div>
       </div>
-      <div className="flex items-baseline gap-2">
-        <span className="text-2xl font-bold font-mono tracking-tight text-white">
+
+      <div className="mt-3 relative z-10">
+        <div className={`text-2xl lg:text-3xl font-bold font-mono tracking-tight ${color}`}>
           {value}
-        </span>
+        </div>
+        {subtext && (
+          <p className="text-[11px] text-slate-500 mt-1 font-sans truncate">
+            {subtext}
+          </p>
+        )}
       </div>
-      {subtitle && (
-        <p className="mt-1 text-xs text-gray-400 flex items-center gap-1">
-          {subtitle}
-        </p>
-      )}
     </div>
   );
-};
-
+}

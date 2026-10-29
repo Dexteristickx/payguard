@@ -1,98 +1,90 @@
-import React, { useState } from "react";
-import { Shield, Play, Loader2, Sparkles } from "lucide-react";
+import { useState } from "react";
 
-interface HeaderProps {
-  isConnected: boolean;
-  onDemoRun?: () => void;
+interface Props {
+  connected: boolean;
+  eventCount: number;
 }
 
-export const Header: React.FC<HeaderProps> = ({ isConnected, onDemoRun }) => {
-  const [isRunningDemo, setIsRunningDemo] = useState(false);
+export function Header({ connected }: Props) {
+  const [demoRunning, setDemoRunning] = useState(false);
 
   const handleRunDemo = async () => {
-    setIsRunningDemo(true);
+    setDemoRunning(true);
     try {
-      const res = await fetch("/v1/demo/run", {
+      await fetch("/v1/demo/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ scenario: "all" }),
       });
-      if (res.ok) {
-        onDemoRun?.();
-      }
     } catch (err) {
-      console.error("Failed to trigger demo:", err);
+      console.error("Demo failed:", err);
     } finally {
-      setTimeout(() => setIsRunningDemo(false), 6000);
+      setTimeout(() => setDemoRunning(false), 3000);
     }
   };
 
   return (
-    <header className="bg-gray-900/90 border-b border-gray-800 px-6 py-3.5 flex items-center justify-between backdrop-blur-md sticky top-0 z-50">
-      <div className="flex items-center gap-3">
-        <div className="relative p-2.5 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.4)] border border-blue-400/30">
-          <Shield className="w-5 h-5 text-white" />
-          <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-gray-900 animate-ping" />
+    <header className="sticky top-0 z-50 px-6 py-3.5 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl flex items-center justify-between shadow-2xl">
+      {/* Brand & Identity */}
+      <div className="flex items-center gap-4">
+        <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 p-0.5 shadow-lg shadow-blue-500/20">
+          <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-lg">
+            🛡️
+          </div>
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            <h1 className="text-xl font-bold tracking-tight text-white font-sans">
               PayGuard
-              <span className="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full">
-                MCP Gateway
-              </span>
             </h1>
+            <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold">
+              MCP Gateway
+            </span>
           </div>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-slate-400 font-normal -mt-0.5">
             Agentic Spending Firewall for PayPal • Real-Time Policy Enforcement
           </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        {/* Live WebSocket Status Pill */}
-        <div
-          className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${
-            isConnected
-              ? "bg-emerald-950/40 text-emerald-400 border-emerald-800/60"
-              : "bg-rose-950/40 text-rose-400 border-rose-800/60"
-          }`}
-        >
+      {/* Status Indicators & Action CTA */}
+      <div className="flex items-center gap-4">
+        {/* Status Pill */}
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/80 border border-slate-800 text-xs text-slate-300 font-mono">
           <span
             className={`w-2 h-2 rounded-full ${
-              isConnected
-                ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse"
+              connected
+                ? "bg-emerald-400 animate-pulse-glow"
                 : "bg-rose-500"
             }`}
           />
-          {isConnected ? "Gateway Online (ws://)" : "Reconnecting Gateway..."}
+          <span>{connected ? "Gateway Online (ws://)" : "Offline"}</span>
         </div>
 
         {/* Sponsor Badges */}
-        <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 bg-gray-800/60 border border-gray-700/60 rounded-lg text-[11px] font-mono text-gray-300">
-          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span>AG Grid • PayPal Sandbox</span>
+        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/50 border border-slate-800/80 text-xs text-slate-400 font-mono">
+          <span className="text-amber-400">✨ AG Grid</span>
+          <span>•</span>
+          <span className="text-blue-400">PayPal Sandbox</span>
         </div>
 
-        {/* 1-Click Demo Mode Button */}
+        {/* Hero Demo Trigger Button */}
         <button
           onClick={handleRunDemo}
-          disabled={isRunningDemo || !isConnected}
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 border shadow-md ${
-            isRunningDemo
-              ? "bg-indigo-900/60 text-indigo-300 border-indigo-700/50 cursor-not-allowed"
-              : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white border-blue-400/30 hover:shadow-blue-500/20"
-          }`}
-          title="Simulate 3-Act Demo (Grocery ALLOW → Sub HOLD → Phishing BLOCK)"
+          disabled={demoRunning}
+          className="relative inline-flex items-center justify-center gap-2 px-5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 hover:from-blue-500 hover:to-indigo-500 transition-all duration-200 shadow-lg shadow-blue-600/30 hover:shadow-blue-500/50 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          {isRunningDemo ? (
+          {demoRunning ? (
             <>
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              <span>Simulating Demo...</span>
+              <svg className="animate-spin h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              <span>Executing 3-Act Demo...</span>
             </>
           ) : (
             <>
-              <Play className="w-3.5 h-3.5 fill-current" />
+              <span className="text-sm">▶</span>
               <span>Run 3-Act Demo</span>
             </>
           )}
@@ -100,5 +92,4 @@ export const Header: React.FC<HeaderProps> = ({ isConnected, onDemoRun }) => {
       </div>
     </header>
   );
-};
-
+}

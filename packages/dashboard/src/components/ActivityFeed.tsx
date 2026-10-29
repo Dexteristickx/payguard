@@ -1,86 +1,77 @@
-import React from "react";
-import type { DashboardEvent } from "../types";
-import { AlertTriangle, CheckCircle2, Clock, ShieldAlert, ArrowRight } from "lucide-react";
+import { useMemo } from "react";
+import type { TransactionRecord } from "../types";
 
-interface ActivityFeedProps {
-  events: DashboardEvent[];
-  onSelectTx?: (id: string) => void;
+interface Props {
+  transactions: TransactionRecord[];
 }
 
-export const ActivityFeed: React.FC<ActivityFeedProps> = ({ events, onSelectTx }) => {
-  const formatTime = (ts: number) => {
-    return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-  };
+const EVENT_META: Record<string, { icon: string; color: string; border: string }> = {
+  COMPLETED: { icon: "✓", color: "text-emerald-400", border: "border-emerald-500/40" },
+  APPROVED: { icon: "✓", color: "text-emerald-400", border: "border-emerald-500/40" },
+  HELD: { icon: "⏸", color: "text-amber-400", border: "border-amber-500/40" },
+  BLOCKED: { icon: "🚫", color: "text-rose-400", border: "border-rose-500/40" },
+  REJECTED: { icon: "✕", color: "text-rose-400", border: "border-rose-500/40" },
+  TIMEOUT: { icon: "⏱", color: "text-slate-400", border: "border-slate-500/40" },
+};
 
-  const getEventIcon = (type: DashboardEvent["type"]) => {
-    switch (type) {
-      case "APPROVAL_REQUESTED":
-      case "POLICY_VIOLATION":
-        return <AlertTriangle className="w-4 h-4 text-amber-400" />;
-      case "APPROVAL_RESOLVED":
-        return <CheckCircle2 className="w-4 h-4 text-emerald-400" />;
-      default:
-        return <ShieldAlert className="w-4 h-4 text-blue-400" />;
-    }
-  };
+export function ActivityFeed({ transactions }: Props) {
+  const recent = useMemo(() => transactions.slice(0, 10), [transactions]);
+
+  if (recent.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-slate-500 text-xs py-12">
+        <span className="text-2xl mb-2">📡</span>
+        <span>Awaiting agent tool calls...</span>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-4 flex flex-col h-full overflow-hidden">
-      <div className="flex items-center justify-between pb-3 mb-2 border-b border-gray-800">
-        <div className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-gray-400" />
-          <h3 className="text-xs font-bold uppercase tracking-wider text-gray-300">
-            Live Gateway Activity
-          </h3>
-        </div>
-        <span className="text-[11px] font-mono text-gray-400">
-          {events.length} events
-        </span>
-      </div>
+    <div className="space-y-2.5 overflow-y-auto max-h-[500px] pr-1">
+      {recent.map((tx) => {
+        const meta = EVENT_META[tx.status] ?? EVENT_META.COMPLETED;
+        return (
+          <div
+            key={tx.id}
+            className={`p-3 rounded-xl bg-slate-900/60 border border-slate-800/80 hover:border-slate-700 transition-all flex items-start gap-3 relative overflow-hidden group`}
+          >
+            <div className={`w-1 h-full absolute left-0 top-0 ${meta.border.replace('border', 'bg')}`} />
+            
+            <div className="flex-1 min-w-0 pl-1">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-mono font-semibold text-slate-200 truncate">
+                  {tx.merchant}
+                </span>
+                <span className="text-xs font-mono font-bold text-slate-100 shrink-0">
+                  ${tx.amount.toFixed(2)}
+                </span>
+              </div>
 
-      <div className="flex-1 overflow-y-auto space-y-2.5 pr-1">
-        {events.length === 0 ? (
-          <div className="h-40 flex flex-col items-center justify-center text-gray-400 text-xs">
-            <Clock className="w-6 h-6 mb-1 text-gray-500 animate-pulse" />
-            <span>Listening for agent transactions...</span>
-          </div>
-        ) : (
-          events.map((ev, idx) => (
-            <div
-              key={`${ev.data?.id}-${ev.timestamp}-${idx}`}
-              onClick={() => ev.data?.id && onSelectTx?.(ev.data.id)}
-              className="p-2.5 rounded-lg bg-gray-950/60 border border-gray-800/80 hover:border-gray-700 transition-colors text-xs cursor-pointer group"
-            >
-              <div className="flex items-start justify-between gap-2 mb-1">
-                <div className="flex items-center gap-1.5 font-semibold text-gray-200">
-                  {getEventIcon(ev.type)}
-                  <span className="font-mono text-[11px]">
-                    {ev.type.replace(/_/g, " ")}
-                  </span>
-                </div>
-                <span className="text-[10px] font-mono text-gray-400">
-                  {formatTime(ev.timestamp)}
+              <div className="flex items-center gap-2 mt-1">
+                <span className={`text-xs ${meta.color}`}>{meta.icon}</span>
+                <span className="text-[11px] font-mono text-slate-400 truncate">
+                  {tx.status}
+                </span>
+                <span className="text-[10px] font-mono text-slate-600 ml-auto">
+                  {new Date(tx.timestamp).toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  })}
                 </span>
               </div>
-              <div className="flex items-center justify-between text-gray-300">
-                <span className="truncate max-w-[140px] text-gray-400">
-                  {ev.data?.merchant}
-                </span>
-                <span className="font-mono font-bold text-gray-200">
-                  ${ev.data?.amount?.toFixed(2)}
-                </span>
-              </div>
-              {ev.data?.policyResult?.triggeredRules?.length > 0 && (
-                <div className="mt-1 text-[10px] text-amber-400/90 truncate flex items-center gap-1">
-                  <ArrowRight className="w-2.5 h-2.5 flex-shrink-0" />
-                  {ev.data.policyResult.triggeredRules[0]}
+
+              {tx.policyResult.triggeredRules.length > 0 && (
+                <div className="mt-1.5 pt-1.5 border-t border-slate-800/50">
+                  <p className="text-[10px] font-mono text-rose-400 truncate">
+                    → {tx.policyResult.triggeredRules[0]}
+                  </p>
                 </div>
               )}
             </div>
-          ))
-        )}
-      </div>
+          </div>
+        );
+      })}
     </div>
   );
-};
-
+}

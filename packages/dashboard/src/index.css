@@ -1,58 +1,94 @@
-@import "ag-grid-community/styles/ag-grid.css";
-@import "ag-grid-community/styles/ag-theme-quartz.css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ─── AG Grid Dark Theme Core Overrides ─── */
-.ag-theme-quartz-dark,
-.ag-theme-quartz {
-  --ag-background-color: #111827 !important;
-  --ag-header-background-color: #1a2236 !important;
-  --ag-odd-row-background-color: #0f1629 !important;
-  --ag-row-hover-color: #1e293b !important;
-  --ag-border-color: #1e293b !important;
-  --ag-header-foreground-color: #94a3b8 !important;
-  --ag-foreground-color: #f8fafc !important;
-  --ag-selected-row-background-color: #1e3a5f !important;
-  --ag-row-border-color: #1e293b !important;
-  --ag-font-size: 13px;
-  --ag-font-family: system-ui, -apple-system, sans-serif;
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #060913;
+    color: #f8fafc;
+    overflow-x: hidden;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
 }
 
-/* Force AG Grid Root & Rows Dark Background */
+/* Ambient Radial Background Mesh */
+.ambient-glow {
+  background: 
+    radial-gradient(circle at 20% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 80% 10%, rgba(139, 92, 246, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(16, 185, 129, 0.04) 0%, transparent 50%);
+}
+
+/* Glassmorphism Card Style */
+.glass-card {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-card-hover {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-hover:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* AG Grid Glassmorphism Theme Overrides */
+.ag-theme-quartz-dark {
+  --ag-background-color: transparent !important;
+  --ag-header-background-color: rgba(15, 23, 42, 0.8) !important;
+  --ag-odd-row-background-color: rgba(15, 23, 42, 0.3) !important;
+  --ag-row-hover-color: rgba(30, 41, 59, 0.7) !important;
+  --ag-border-color: rgba(255, 255, 255, 0.06) !important;
+  --ag-header-foreground-color: #94a3b8 !important;
+  --ag-foreground-color: #f8fafc !important;
+  --ag-selected-row-background-color: rgba(59, 130, 246, 0.15) !important;
+  --ag-row-border-color: rgba(255, 255, 255, 0.04) !important;
+  --ag-font-size: 13px;
+  --ag-font-family: 'Inter', system-ui, sans-serif;
+  --ag-header-height: 46px;
+  --ag-row-height: 52px;
+}
+
 .ag-root-wrapper,
 .ag-root-wrapper-body,
 .ag-body-viewport,
 .ag-row,
-.ag-header,
-.ag-paging-panel {
-  background-color: #111827 !important;
+.ag-header {
+  background-color: transparent !important;
   color: #f8fafc !important;
-  border-color: #1e293b !important;
 }
 
-/* Fix Merchant/Payee & Cell Text Visibility */
 .ag-cell {
   color: #f8fafc !important;
   display: flex !important;
   align-items: center !important;
 }
 
-/* Fix Pagination Bar Theme */
+/* Pagination Styling */
 .ag-paging-panel {
-  background-color: #111827 !important;
+  background-color: rgba(15, 23, 42, 0.8) !important;
   color: #94a3b8 !important;
-  border-top: 1px solid #1e293b !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
 }
 
 .ag-paging-panel select,
 .ag-paging-panel button {
-  background-color: #1a2236 !important;
+  background-color: rgba(30, 41, 59, 0.8) !important;
   color: #f8fafc !important;
-  border: 1px solid #374766 !important;
-  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 6px;
+  padding: 2px 6px;
 }
 
 /* Custom Scrollbar */
@@ -61,18 +97,22 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #111827;
+  background: #080c14;
 }
 ::-webkit-scrollbar-thumb {
-  background: #374766;
+  background: #1e293b;
   border-radius: 3px;
 }
-
-/* Live Dot Pulse */
-@keyframes pulse-live {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
 }
-.animate-pulse-live {
-  animation: pulse-live 1.5s ease-in-out infinite;
+
+/* Pulse animation */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.95); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

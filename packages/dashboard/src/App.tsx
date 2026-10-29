@@ -1,122 +1,140 @@
-import { useState } from "react";
 import { Header } from "./components/Header";
 import { StatCard } from "./components/StatCard";
 import { TransactionGrid } from "./components/TransactionGrid";
 import { ActivityFeed } from "./components/ActivityFeed";
 import { useWebSocket } from "./hooks/useWebSocket";
 import { useStats } from "./hooks/useStats";
-import {
-  ShieldCheck,
-  ShieldAlert,
-  Clock,
-  DollarSign,
-  TrendingUp,
-} from "lucide-react";
 
-export function App() {
-  const { transactions, events, isConnected, resolveApproval, refetch } =
-    useWebSocket();
+export default function App() {
+  const { transactions, connected, eventCount } = useWebSocket();
   const stats = useStats(transactions);
-  const [selectedTxId, setSelectedTxId] = useState<string | undefined>();
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#0B0F17] text-gray-100 overflow-hidden">
-      {/* 1. Header */}
-      <Header isConnected={isConnected} onDemoRun={refetch} />
+    <div className="min-h-screen flex flex-col bg-[#060913] text-slate-100 ambient-glow selection:bg-blue-500/30">
+      <Header connected={connected} eventCount={eventCount} />
 
-      {/* 2. Main Content Body */}
-      <main className="flex-1 flex flex-col min-h-0 p-5 gap-4 overflow-hidden">
-        {/* Stat Cards Row */}
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-3.5 flex-shrink-0">
+      <main className="flex-1 flex flex-col p-4 md:p-6 space-y-5 max-w-[1700px] w-full mx-auto min-h-0">
+        {/* Metric Cards Row */}
+        <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
           <StatCard
-            title="Transactions Intercepted"
-            value={stats.totalCount}
-            subtitle="Autonomous agent requests"
-            icon={ShieldCheck}
-            variant="blue"
+            label="Intercepted"
+            value={stats.total}
+            icon="🛡️"
+            color="text-indigo-400"
+            glowColor="rgba(99, 102, 241, 0.15)"
+            subtext="Autonomous requests"
           />
           <StatCard
-            title="Total Volume"
+            label="Total Volume"
             value={`$${stats.totalVolume.toFixed(2)}`}
-            subtitle="Intercepted transaction sum"
-            icon={DollarSign}
-            variant="emerald"
+            icon="💰"
+            color="text-emerald-400"
+            glowColor="rgba(16, 185, 129, 0.15)"
+            subtext="Guarded volume sum"
           />
           <StatCard
-            title="Active Holds (HITL)"
-            value={stats.heldCount}
-            subtitle="Awaiting human approval"
-            icon={Clock}
-            variant="amber"
+            label="Active Holds"
+            value={stats.held}
+            icon="⏸️"
+            color="text-amber-400"
+            glowColor="rgba(245, 158, 11, 0.15)"
+            subtext="HITL mobile pending"
           />
           <StatCard
-            title="High-Risk Blocked"
-            value={stats.blockedCount}
-            subtitle={`Avg risk score: ${stats.avgRiskScore}/100`}
-            icon={ShieldAlert}
-            variant="rose"
+            label="High-Risk Blocked"
+            value={stats.blocked}
+            icon="🚫"
+            color="text-rose-400"
+            glowColor="rgba(244, 63, 94, 0.15)"
+            subtext="Phishing & threat halted"
+          />
+          <StatCard
+            label="Approved"
+            value={stats.completed}
+            icon="✅"
+            color="text-emerald-400"
+            glowColor="rgba(16, 185, 129, 0.15)"
+            subtext="Passed security check"
+          />
+          <StatCard
+            label="Avg Risk Score"
+            value={`${stats.avgRisk}/100`}
+            icon="🎯"
+            color={
+              stats.avgRisk >= 70
+                ? "text-rose-400"
+                : stats.avgRisk >= 30
+                  ? "text-amber-400"
+                  : "text-emerald-400"
+            }
+            glowColor={
+              stats.avgRisk >= 70
+                ? "rgba(244, 63, 94, 0.15)"
+                : "rgba(16, 185, 129, 0.15)"
+            }
+            subtext="Gateway threat index"
           />
         </section>
 
-        {/* Workspace: AG Grid Table (Main) + Activity Feed (Side) */}
-        {/* CRITICAL: min-h-0 ensures AG Grid correctly constrains height and scrolls */}
-        <div className="flex-1 flex min-h-0 gap-4 overflow-hidden">
+        {/* Main Content Workspace */}
+        <section className="flex-1 flex flex-col lg:flex-row gap-5 min-h-[580px]">
           {/* Main AG Grid Container */}
-          <div className="flex-1 flex flex-col min-h-0 min-w-0">
-            <div className="flex items-center justify-between mb-2 flex-shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-300">
+          <div className="flex-1 glass-card rounded-2xl overflow-hidden flex flex-col border border-slate-800/80">
+            <div className="px-5 py-4 border-b border-slate-800/80 flex items-center justify-between bg-slate-900/40">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
+                <h2 className="text-sm font-semibold text-slate-200 tracking-wide uppercase">
                   Transaction Audit Stream
-                </span>
-                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-gray-800 text-gray-400 border border-gray-700">
-                  AG Grid Community v33
+                </h2>
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  AG Grid v33 Quartz
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-gray-400">
-                <span className="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
-                <span>Real-Time Updates Active</span>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span className="text-xs text-slate-400 font-mono">
+                  Live Stream Active
+                </span>
               </div>
             </div>
 
-            <div className="flex-1 min-h-0">
-              <TransactionGrid
-                transactions={transactions}
-                onResolveApproval={resolveApproval}
-                selectedId={selectedTxId}
-              />
+            <div className="flex-1 min-h-[460px] relative">
+              <TransactionGrid transactions={transactions} />
             </div>
           </div>
 
-          {/* Side Activity Feed */}
-          <aside className="w-80 flex-shrink-0 flex flex-col min-h-0 hidden lg:flex">
-            <ActivityFeed events={events} onSelectTx={setSelectedTxId} />
+          {/* Activity Feed Sidebar */}
+          <aside className="w-full lg:w-96 glass-card rounded-2xl overflow-hidden flex flex-col border border-slate-800/80 shrink-0">
+            <div className="px-5 py-4 border-b border-slate-800/80 flex items-center justify-between bg-slate-900/40">
+              <h2 className="text-sm font-semibold text-slate-200 tracking-wide uppercase">
+                Live Gateway Activity
+              </h2>
+              <span className="text-xs text-slate-400 font-mono">
+                {eventCount} events
+              </span>
+            </div>
+            <div className="flex-1 p-3 overflow-hidden">
+              <ActivityFeed transactions={transactions} />
+            </div>
           </aside>
-        </div>
+        </section>
       </main>
 
-      {/* 3. Sub-footer Status Bar */}
-      <footer className="h-7 bg-gray-950 border-t border-gray-800/80 px-4 flex items-center justify-between text-[11px] font-mono text-gray-400 flex-shrink-0">
+      {/* Footer Bar */}
+      <footer className="px-6 py-3 border-t border-slate-800/60 bg-slate-950/80 backdrop-blur-md flex flex-wrap items-center justify-between text-xs text-slate-500 font-mono">
         <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-            AP2 Agent Payments Protocol Guard
+          <span className="flex items-center gap-1.5 text-slate-400">
+            <span className="text-blue-400">🛡️</span> AP2 Mandate Guard
           </span>
-          <span className="hidden md:inline">
-            Rules: Velocity (3/10m) • Threshold ($50) • Trust Score (&lt;70)
-          </span>
+          <span>•</span>
+          <span>Rules: Velocity (3/10m) | Threshold ($50) | Trust Score (&lt;70)</span>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-gray-400 flex items-center gap-1">
-            <TrendingUp className="w-3 h-3 text-emerald-400" />
-            Zero Compromised Transactions
-          </span>
-          <span className="text-gray-400">|</span>
-          <span className="text-gray-400">PayGuard v0.1.0</span>
+        <div className="flex items-center gap-4">
+          <span className="text-emerald-400">⚡ 100% Compromised Transactions Halted</span>
+          <span>•</span>
+          <span>PayGuard v0.1.0</span>
         </div>
       </footer>
     </div>
   );
 }
-
-export default App;
-

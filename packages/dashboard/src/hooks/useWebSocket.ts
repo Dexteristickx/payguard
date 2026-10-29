@@ -96,6 +96,8 @@ export function useWebSocket() {
     transactions,
     events,
     isConnected,
+    connected: isConnected,
+    eventCount: events.length,
     refetch: fetchTransactions,
     resolveApproval,
   };

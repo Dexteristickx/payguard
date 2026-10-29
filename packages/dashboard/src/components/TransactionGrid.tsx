@@ -1,189 +1,170 @@
-import React, { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
-import {
-  ColDef,
-  ModuleRegistry,
-  AllCommunityModule,
-  ICellRendererParams,
-} from "ag-grid-community";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
+import { ModuleRegistry, AllCommunityModule, type ColDef } from "ag-grid-community";
 import type { TransactionRecord } from "../types";
 import { StatusBadge } from "./StatusBadge";
 import { RiskGauge } from "./RiskGauge";
-import { Check, X, ShieldAlert } from "lucide-react";
 
-// Register AG Grid Community modules
+// Register AG Grid Community Modules
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-interface TransactionGridProps {
+interface Props {
   transactions: TransactionRecord[];
-  onResolveApproval?: (approvalId: string, decision: "approve" | "reject") => void;
-  selectedId?: string;
 }
 
-export const TransactionGrid: React.FC<TransactionGridProps> = ({
-  transactions,
-  onResolveApproval,
-}) => {
-  const columnDefs: ColDef<TransactionRecord>[] = useMemo(
+export function TransactionGrid({ transactions }: Props) {
+  const [processingId, setProcessingId] = useState<string | null>(null);
+
+  const handleApproval = async (approvalId: string, decision: "approve" | "reject") => {
+    setProcessingId(approvalId);
+    try {
+      await fetch(`/v1/approvals/${approvalId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ decision }),
+      });
+    } catch (err) {
+      console.error("Approval error:", err);
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const columnDefs = useMemo<ColDef<TransactionRecord>[]>(
     () => [
       {
-        field: "timestamp",
         headerName: "Time",
+        field: "timestamp",
         width: 110,
-        valueFormatter: (params) => {
-          if (!params.value) return "";
-          return new Date(params.value).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-          });
-        },
+        cellRenderer: (params: { value: number }) => (
+          <span className="font-mono text-xs text-slate-400">
+            {new Date(params.value).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })}
+          </span>
+        ),
+        sortable: true,
         sort: "desc",
       },
       {
-        field: "agentId",
         headerName: "Agent ID",
+        field: "agentId",
         width: 170,
-        cellRenderer: (params: ICellRendererParams<TransactionRecord>) => (
-          <span className="font-mono text-xs text-blue-400 bg-blue-950/40 px-2 py-0.5 rounded border border-blue-900/50">
+        cellRenderer: (params: { value: string }) => (
+          <span className="font-mono text-xs text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20 truncate">
             {params.value}
           </span>
         ),
       },
       {
-        field: "merchant",
         headerName: "Merchant / Payee",
+        field: "merchant",
         flex: 1,
-        minWidth: 180,
-        cellRenderer: (params: ICellRendererParams<TransactionRecord>) => (
-          <span className="text-sm font-medium text-slate-100 tracking-wide font-mono">
+        minWidth: 200,
+        cellRenderer: (params: { value: string }) => (
+          <span className="text-xs font-mono font-medium text-slate-100 tracking-wide truncate">
             {params.value}
           </span>
         ),
       },
       {
-        field: "amount",
         headerName: "Amount",
+        field: "amount",
         width: 120,
-        cellRenderer: (params: ICellRendererParams<TransactionRecord>) => {
-          const val = params.value as number;
-          const isLarge = val > 50;
-          return (
-            <span
-              className={`font-mono font-bold text-xs ${isLarge ? "text-amber-300" : "text-emerald-400"
-                }`}
-            >
-              ${val?.toFixed(2)}{" "}
-              <span className="text-[10px] text-gray-400 font-normal">
-                {params.data?.currency || "USD"}
-              </span>
+        cellRenderer: (params: { value: number; data: TransactionRecord }) => (
+          <span className="font-mono text-xs font-bold text-slate-100">
+            ${params.value.toFixed(2)}{" "}
+            <span className="text-[10px] font-normal text-slate-500">
+              {params.data.currency}
             </span>
-          );
-        },
+          </span>
+        ),
+        sortable: true,
       },
       {
-        field: "policyResult.riskScore",
         headerName: "Risk Score",
-        width: 160,
-        cellRenderer: (params: ICellRendererParams<TransactionRecord>) => (
-          <RiskGauge score={params.data?.policyResult?.riskScore ?? 0} />
+        field: "policyResult.riskScore",
+        width: 130,
+        cellRenderer: (params: { data: TransactionRecord }) => (
+          <RiskGauge score={params.data.policyResult.riskScore} />
         ),
+        sortable: true,
       },
       {
-        field: "status",
         headerName: "Verdict / Status",
-        width: 150,
-        cellRenderer: (params: ICellRendererParams<TransactionRecord>) => (
-          <StatusBadge status={params.value} />
+        field: "status",
+        width: 140,
+        cellRenderer: (params: { data: TransactionRecord }) => (
+          <StatusBadge status={params.data.status} />
         ),
-      },
-      {
-        field: "policyResult.triggeredRules",
-        headerName: "Triggered Policies",
-        flex: 1.5,
-        minWidth: 260,
-        cellRenderer: (params: ICellRendererParams<TransactionRecord>) => {
-          const rules: string[] = params.value || [];
-          if (!rules || rules.length === 0) {
-            return (
-              <span className="text-xs text-gray-400 italic">None (Clean pass)</span>
-            );
-          }
-          return (
-            <div className="flex flex-wrap gap-1 items-center h-full py-1">
-              {rules.map((rule, idx) => (
-                <span
-                  key={idx}
-                  className="inline-flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded bg-gray-800 text-amber-300 border border-amber-900/40 truncate max-w-[240px]"
-                  title={rule}
-                >
-                  <ShieldAlert className="w-2.5 h-2.5 text-amber-400 flex-shrink-0" />
-                  {rule.split(":")[0]}
-                </span>
-              ))}
-            </div>
-          );
-        },
       },
       {
         headerName: "Actions",
-        width: 150,
-        pinned: "right",
-        cellRenderer: (params: ICellRendererParams<TransactionRecord>) => {
+        width: 180,
+        cellRenderer: (params: { data: TransactionRecord }) => {
           const tx = params.data;
-          if (!tx || tx.status !== "HELD" || !tx.approvalId) {
+          if (tx.status === "HELD" && tx.approvalId) {
+            const isProcessing = processingId === tx.approvalId;
             return (
-              <span className="text-[11px] text-gray-400 font-mono">
-                {tx?.paypalOrderId ? `Order #${tx.paypalOrderId.slice(-6)}` : "—"}
+              <div className="flex items-center gap-1.5">
+                <button
+                  disabled={isProcessing}
+                  onClick={() => handleApproval(tx.approvalId!, "approve")}
+                  className="px-2.5 py-1 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-medium transition-all active:scale-95 cursor-pointer"
+                >
+                  ✓ Approve
+                </button>
+                <button
+                  disabled={isProcessing}
+                  onClick={() => handleApproval(tx.approvalId!, "reject")}
+                  className="px-2.5 py-1 rounded bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-medium transition-all active:scale-95 cursor-pointer"
+                >
+                  ✕ Reject
+                </button>
+              </div>
+            );
+          }
+
+          if (tx.paypalOrderId) {
+            return (
+              <span className="text-[11px] font-mono text-slate-500">
+                Order #{tx.paypalOrderId.slice(-6)}
               </span>
             );
           }
-          return (
-            <div className="flex items-center gap-1.5 h-full">
-              <button
-                onClick={() => onResolveApproval?.(tx.approvalId!, "approve")}
-                className="px-2 py-0.5 text-[11px] font-bold rounded bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-0.5 transition shadow"
-                title="Authorize and forward to PayPal"
-              >
-                <Check className="w-3 h-3" /> Approve
-              </button>
-              <button
-                onClick={() => onResolveApproval?.(tx.approvalId!, "reject")}
-                className="px-2 py-0.5 text-[11px] font-bold rounded bg-rose-700 hover:bg-rose-600 text-white flex items-center gap-0.5 transition shadow"
-                title="Reject transaction"
-              >
-                <X className="w-3 h-3" /> Reject
-              </button>
-            </div>
-          );
+
+          return <span className="text-[11px] text-slate-600">—</span>;
         },
       },
     ],
-    [onResolveApproval]
+    [processingId]
   );
 
   const defaultColDef = useMemo<ColDef>(
     () => ({
-      sortable: true,
-      filter: true,
       resizable: true,
+      sortable: false,
+      filter: false,
     }),
     []
   );
 
   return (
-    <div className="w-full h-full ag-theme-quartz-dark rounded-xl overflow-hidden border border-gray-800 shadow-xl">
+    <div className="ag-theme-quartz-dark w-full h-full absolute inset-0">
       <AgGridReact
         rowData={transactions}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
-        rowSelection="single"
         animateRows={true}
-        pagination={true}
-        paginationPageSize={20}
+        rowSelection="single"
         getRowId={(params) => params.data.id}
+        domLayout="normal"
+        suppressCellFocus={true}
       />
     </div>
   );
-};
-
+}

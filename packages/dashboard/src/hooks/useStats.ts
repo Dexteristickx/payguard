@@ -26,11 +26,16 @@ export function useStats(transactions: TransactionRecord[]): DashboardStats {
     const avgRiskScore = totalCount > 0 ? Math.round(totalRisk / totalCount) : 0;
 
     return {
+      total: totalCount,
       totalCount,
       totalVolume,
+      blocked: blockedCount,
       blockedCount,
+      held: heldCount,
       heldCount,
+      completed: approvedCount,
       approvedCount,
+      avgRisk: avgRiskScore,
       avgRiskScore,
     };
   }, [transactions]);
