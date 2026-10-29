@@ -15,19 +15,18 @@ PayGuard is an Agentic Spending Firewall for PayPal MCP built for the PayPal AI 
 - [x] Block 2: Implement `@payguard/telegram-bot` for real-time mobile push notifications & 1-tap inline approval/rejection
 - [x] Run and verify the 3-scene automated demo (`pnpm demo`)
 - [x] Block 3: Build real-time AG Grid security dashboard (`@payguard/dashboard`)
-- [ ] Block 4: APIMatic SDK & Devpost submission assets
+- [x] Block 4A: Devpost submission write-up (`DEVPOST.md`) with 2.5-min video script & timecodes
+- [x] Block 4B: Demo video script & presentation choreography mapped
+- [x] Block 4C: OpenAPI 3.0.3 spec (`/v1/openapi.json`) & `@payguard/sdk` client package scaffolded and compiled
+- [ ] Block 4D: Live Telegram bot token link & recording final video
 
 ## Key Files & Recent Modifications
-- `packages/dashboard/`: Complete Vite + React + AG Grid Community v33 fintech console
-  - `src/App.tsx`: Main dashboard layout with `flex-1 min-h-0` grid container and stat cards
-  - `src/components/Header.tsx`: Header with live WebSocket indicator and 1-Click "Run 3-Act Demo" button
-  - `src/components/TransactionGrid.tsx`: AG Grid table with Quartz dark theme, custom renderers, and inline Approve/Reject action buttons
-  - `src/components/ActivityFeed.tsx`: Real-time streaming log of gateway decisions
-  - `src/components/StatusBadge.tsx`: Color-coded animated verdict pills
-  - `src/components/RiskGauge.tsx`: Visual risk score bar and metric
-  - `src/hooks/useWebSocket.ts`: Live WebSocket connection to `/v1/ws` with auto-reconnect
-- `packages/proxy/src/index.ts`: Added `/v1/demo/run` route for instant 1-click in-dashboard demo execution
+- `README.md`: Comprehensive open-source documentation with architecture diagram, quickstart, and sponsor details
+- `DEVPOST.md`: Ready-to-submit Devpost application content with video script and timecodes
+- `packages/sdk/`: Client SDK package with `PayGuardClient`, types, and `openapi.json` for APIMatic
+- `packages/proxy/src/index.ts`: Added `/v1/openapi.json` spec endpoint and `/v1/demo/run` route
+- `packages/dashboard/`: AG Grid Community v33 dark-mode console running on `http://localhost:5173`
 
 ## Next Immediate Action
-Configure live Telegram bot notifications (`@BotFather`) or package the APIMatic SDK & Devpost submission demo recording.
+Connect live `TELEGRAM_BOT_TOKEN` in `.env` (optional, takes 2 mins with `@BotFather`), record the 2.5-minute demo video following `DEVPOST.md`, and submit to Devpost!
 

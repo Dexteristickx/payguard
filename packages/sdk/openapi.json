@@ -1,0 +1,238 @@
+﻿{
+    "openapi":  "3.0.3",
+    "info":  {
+                 "title":  "PayGuard API",
+                 "version":  "0.1.0",
+                 "description":  "Agentic Spending Firewall \u0026 Policy Proxy for PayPal MCP"
+             },
+    "servers":  [
+                    {
+                        "url":  "http://localhost:3100"
+                    }
+                ],
+    "paths":  {
+                  "/v1/mcp":  {
+                                  "post":  {
+                                               "summary":  "Intercept and evaluate MCP JSON-RPC tool call",
+                                               "description":  "Inspects payment tool calls, evaluates policy rules, and forwards or holds the transaction.",
+                                               "requestBody":  {
+                                                                   "required":  true,
+                                                                   "content":  {
+                                                                                   "application/json":  {
+                                                                                                            "schema":  {
+                                                                                                                           "$ref":  "#/components/schemas/JsonRpcRequest"
+                                                                                                                       }
+                                                                                                        }
+                                                                               }
+                                                               },
+                                               "responses":  {
+                                                                 "200":  {
+                                                                             "description":  "JSON-RPC response containing execution verdict or forward result",
+                                                                             "content":  {
+                                                                                             "application/json":  {
+                                                                                                                      "schema":  {
+                                                                                                                                     "$ref":  "#/components/schemas/JsonRpcResponse"
+                                                                                                                                 }
+                                                                                                                  }
+                                                                                         }
+                                                                         }
+                                                             }
+                                           }
+                              },
+                  "/v1/approvals/{approvalId}":  {
+                                                     "post":  {
+                                                                  "summary":  "Resolve held approval",
+                                                                  "description":  "Human-in-the-loop decision webhook called via Telegram button or Dashboard action.",
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "approvalId",
+                                                                                         "in":  "path",
+                                                                                         "required":  true,
+                                                                                         "schema":  {
+                                                                                                        "type":  "string"
+                                                                                                    }
+                                                                                     }
+                                                                                 ],
+                                                                  "requestBody":  {
+                                                                                      "required":  true,
+                                                                                      "content":  {
+                                                                                                      "application/json":  {
+                                                                                                                               "schema":  {
+                                                                                                                                              "type":  "object",
+                                                                                                                                              "required":  [
+                                                                                                                                                               "decision"
+                                                                                                                                                           ],
+                                                                                                                                              "properties":  {
+                                                                                                                                                                 "decision":  {
+                                                                                                                                                                                  "type":  "string",
+                                                                                                                                                                                  "enum":  [
+                                                                                                                                                                                               "approve",
+                                                                                                                                                                                               "reject"
+                                                                                                                                                                                           ]
+                                                                                                                                                                              }
+                                                                                                                                                             }
+                                                                                                                                          }
+                                                                                                                           }
+                                                                                                  }
+                                                                                  },
+                                                                  "responses":  {
+                                                                                    "200":  {
+                                                                                                "description":  "Approval resolved and transaction processed"
+                                                                                            },
+                                                                                    "404":  {
+                                                                                                "description":  "Approval not found or expired"
+                                                                                            }
+                                                                                }
+                                                              }
+                                                 },
+                  "/v1/transactions":  {
+                                           "get":  {
+                                                       "summary":  "List all intercepted transactions",
+                                                       "description":  "Returns the in-memory transaction audit log for dashboard and monitoring.",
+                                                       "responses":  {
+                                                                         "200":  {
+                                                                                     "description":  "Array of transaction audit records",
+                                                                                     "content":  {
+                                                                                                     "application/json":  {
+                                                                                                                              "schema":  {
+                                                                                                                                             "type":  "array",
+                                                                                                                                             "items":  {
+                                                                                                                                                           "$ref":  "#/components/schemas/TransactionRecord"
+                                                                                                                                                       }
+                                                                                                                                         }
+                                                                                                                          }
+                                                                                                 }
+                                                                                 }
+                                                                     }
+                                                   }
+                                       },
+                  "/v1/demo/run":  {
+                                       "post":  {
+                                                    "summary":  "Run 3-Act Demo Simulation",
+                                                    "description":  "Executes the 3 scenes (Normal Grocery, Prompt-Injected Sub, Phishing Scammer) with delays.",
+                                                    "responses":  {
+                                                                      "200":  {
+                                                                                  "description":  "Demo initiated"
+                                                                              }
+                                                                  }
+                                                }
+                                   },
+                  "/health":  {
+                                  "get":  {
+                                              "summary":  "Service Health Check",
+                                              "responses":  {
+                                                                "200":  {
+                                                                            "description":  "Service is healthy"
+                                                                        }
+                                                            }
+                                          }
+                              }
+              },
+    "components":  {
+                       "schemas":  {
+                                       "JsonRpcRequest":  {
+                                                              "type":  "object",
+                                                              "required":  [
+                                                                               "jsonrpc",
+                                                                               "id",
+                                                                               "method"
+                                                                           ],
+                                                              "properties":  {
+                                                                                 "jsonrpc":  {
+                                                                                                 "type":  "string",
+                                                                                                 "example":  "2.0"
+                                                                                             },
+                                                                                 "id":  {
+                                                                                            "oneOf":  [
+                                                                                                          {
+                                                                                                              "type":  "integer"
+                                                                                                          },
+                                                                                                          {
+                                                                                                              "type":  "string"
+                                                                                                          }
+                                                                                                      ]
+                                                                                        },
+                                                                                 "method":  {
+                                                                                                "type":  "string",
+                                                                                                "example":  "tools/call"
+                                                                                            },
+                                                                                 "params":  {
+                                                                                                "type":  "object"
+                                                                                            }
+                                                                             }
+                                                          },
+                                       "JsonRpcResponse":  {
+                                                               "type":  "object",
+                                                               "required":  [
+                                                                                "jsonrpc",
+                                                                                "id"
+                                                                            ],
+                                                               "properties":  {
+                                                                                  "jsonrpc":  {
+                                                                                                  "type":  "string",
+                                                                                                  "example":  "2.0"
+                                                                                              },
+                                                                                  "id":  {
+                                                                                             "oneOf":  [
+                                                                                                           {
+                                                                                                               "type":  "integer"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "type":  "string"
+                                                                                                           }
+                                                                                                       ]
+                                                                                         },
+                                                                                  "result":  {
+                                                                                                 "type":  "object"
+                                                                                             },
+                                                                                  "error":  {
+                                                                                                "type":  "object"
+                                                                                            }
+                                                                              }
+                                                           },
+                                       "TransactionRecord":  {
+                                                                 "type":  "object",
+                                                                 "properties":  {
+                                                                                    "id":  {
+                                                                                               "type":  "string"
+                                                                                           },
+                                                                                    "agentId":  {
+                                                                                                    "type":  "string"
+                                                                                                },
+                                                                                    "timestamp":  {
+                                                                                                      "type":  "integer"
+                                                                                                  },
+                                                                                    "merchant":  {
+                                                                                                     "type":  "string"
+                                                                                                 },
+                                                                                    "amount":  {
+                                                                                                   "type":  "number"
+                                                                                               },
+                                                                                    "currency":  {
+                                                                                                     "type":  "string"
+                                                                                                 },
+                                                                                    "intent":  {
+                                                                                                   "type":  "string"
+                                                                                               },
+                                                                                    "status":  {
+                                                                                                   "type":  "string",
+                                                                                                   "enum":  [
+                                                                                                                "COMPLETED",
+                                                                                                                "HELD",
+                                                                                                                "APPROVED",
+                                                                                                                "REJECTED",
+                                                                                                                "BLOCKED",
+                                                                                                                "TIMEOUT"
+                                                                                                            ]
+                                                                                               },
+                                                                                    "approvalId":  {
+                                                                                                       "type":  "string"
+                                                                                                   },
+                                                                                    "paypalOrderId":  {
+                                                                                                          "type":  "string"
+                                                                                                      }
+                                                                                }
+                                                             }
+                                   }
+                   }
+}

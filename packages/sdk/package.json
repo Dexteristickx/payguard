@@ -1,0 +1,24 @@
+{
+  "name": "@payguard/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for PayGuard — Agentic Spending Firewall for PayPal MCP",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "paypal",
+    "mcp",
+    "agentic-commerce",
+    "firewall",
+    "ai-agent",
+    "ap2"
+  ],
+  "author": "PayGuard Team",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}
