@@ -54,13 +54,11 @@ export const TransactionGrid: React.FC<TransactionGridProps> = ({
         field: "merchant",
         headerName: "Merchant / Payee",
         flex: 1,
-        minWidth: 200,
+        minWidth: 180,
         cellRenderer: (params: ICellRendererParams<TransactionRecord>) => (
-          <div className="flex items-center gap-2 truncate">
-            <span className="font-mono text-xs text-gray-200">
-              {params.value}
-            </span>
-          </div>
+          <span className="text-sm font-medium text-slate-100 tracking-wide font-mono">
+            {params.value}
+          </span>
         ),
       },
       {
@@ -72,9 +70,8 @@ export const TransactionGrid: React.FC<TransactionGridProps> = ({
           const isLarge = val > 50;
           return (
             <span
-              className={`font-mono font-bold text-xs ${
-                isLarge ? "text-amber-300" : "text-emerald-400"
-              }`}
+              className={`font-mono font-bold text-xs ${isLarge ? "text-amber-300" : "text-emerald-400"
+                }`}
             >
               ${val?.toFixed(2)}{" "}
               <span className="text-[10px] text-gray-400 font-normal">

@@ -5,38 +5,74 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: dark;
-}
-
-/* Custom AG Grid Dark Overrides to match fintech aesthetic */
-.ag-theme-quartz-dark {
-  --ag-background-color: #0d131f;
-  --ag-header-background-color: #111827;
-  --ag-odd-row-background-color: #0f172a;
-  --ag-border-color: #1f2937;
-  --ag-row-border-color: #1f2937;
-  --ag-header-column-separator-color: #1f2937;
-  --ag-font-family: 'JetBrains Mono', monospace;
+/* ─── AG Grid Dark Theme Core Overrides ─── */
+.ag-theme-quartz-dark,
+.ag-theme-quartz {
+  --ag-background-color: #111827 !important;
+  --ag-header-background-color: #1a2236 !important;
+  --ag-odd-row-background-color: #0f1629 !important;
+  --ag-row-hover-color: #1e293b !important;
+  --ag-border-color: #1e293b !important;
+  --ag-header-foreground-color: #94a3b8 !important;
+  --ag-foreground-color: #f8fafc !important;
+  --ag-selected-row-background-color: #1e3a5f !important;
+  --ag-row-border-color: #1e293b !important;
   --ag-font-size: 13px;
-  --ag-header-cell-font-weight: 600;
-  --ag-row-hover-color: #1e293b;
-  --ag-selected-row-background-color: #1e3a5f;
+  --ag-font-family: system-ui, -apple-system, sans-serif;
 }
 
-/* Custom scrollbars */
+/* Force AG Grid Root & Rows Dark Background */
+.ag-root-wrapper,
+.ag-root-wrapper-body,
+.ag-body-viewport,
+.ag-row,
+.ag-header,
+.ag-paging-panel {
+  background-color: #111827 !important;
+  color: #f8fafc !important;
+  border-color: #1e293b !important;
+}
+
+/* Fix Merchant/Payee & Cell Text Visibility */
+.ag-cell {
+  color: #f8fafc !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Fix Pagination Bar Theme */
+.ag-paging-panel {
+  background-color: #111827 !important;
+  color: #94a3b8 !important;
+  border-top: 1px solid #1e293b !important;
+}
+
+.ag-paging-panel select,
+.ag-paging-panel button {
+  background-color: #1a2236 !important;
+  color: #f8fafc !important;
+  border: 1px solid #374766 !important;
+  border-radius: 4px;
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b0f17;
+  background: #111827;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1f2937;
+  background: #374766;
   border-radius: 3px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #374151;
-}
 
+/* Live Dot Pulse */
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.animate-pulse-live {
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
