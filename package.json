@@ -5,8 +5,10 @@
   "description": "Agentic Spending Firewall for PayPal MCP",
   "scripts": {
     "dev": "pnpm --filter @payguard/proxy dev",
+    "dev:dash": "pnpm --filter @payguard/dashboard dev",
     "dev:bot": "pnpm --filter @payguard/telegram-bot dev",
     "build": "pnpm -r build",
+    "build:dash": "pnpm --filter @payguard/dashboard build",
     "lint": "pnpm -r lint",
     "demo": "pnpm --filter @payguard/proxy demo"
   },

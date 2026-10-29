@@ -1,0 +1,42 @@
+@import "ag-grid-community/styles/ag-grid.css";
+@import "ag-grid-community/styles/ag-theme-quartz.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+/* Custom AG Grid Dark Overrides to match fintech aesthetic */
+.ag-theme-quartz-dark {
+  --ag-background-color: #0d131f;
+  --ag-header-background-color: #111827;
+  --ag-odd-row-background-color: #0f172a;
+  --ag-border-color: #1f2937;
+  --ag-row-border-color: #1f2937;
+  --ag-header-column-separator-color: #1f2937;
+  --ag-font-family: 'JetBrains Mono', monospace;
+  --ag-font-size: 13px;
+  --ag-header-cell-font-weight: 600;
+  --ag-row-hover-color: #1e293b;
+  --ag-selected-row-background-color: #1e3a5f;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0f17;
+}
+::-webkit-scrollbar-thumb {
+  background: #1f2937;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}
+

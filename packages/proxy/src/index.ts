@@ -81,6 +81,93 @@ app.get("/v1/transactions", async () => {
   return getAllTransactions();
 });
 
+// ─── Demo Trigger API (Dashboard 1-Click Demo Mode) ───────────
+
+app.post("/v1/demo/run", async (_request, reply) => {
+  const scenarios: Array<{
+    name: string;
+    agentId: string;
+    toolCall: JsonRpcRequest;
+  }> = [
+    {
+      name: "Scene 1: Normal grocery purchase ($12.00)",
+      agentId: "sarah-shopping-agent",
+      toolCall: {
+        jsonrpc: "2.0",
+        id: Date.now() + 1,
+        method: "tools/call",
+        params: {
+          name: "create_order",
+          arguments: {
+            intent: "CAPTURE",
+            purchase_units: [
+              {
+                amount: { currency_code: "USD", value: "12.00" },
+                payee: { email_address: "legit-merchant@example.com" },
+                description: "Weekly groceries",
+              },
+            ],
+          },
+        },
+      },
+    },
+    {
+      name: "Scene 2: Prompt-injected $400 subscription (HOLD)",
+      agentId: "sarah-shopping-agent",
+      toolCall: {
+        jsonrpc: "2.0",
+        id: Date.now() + 2,
+        method: "tools/call",
+        params: {
+          name: "create_order",
+          arguments: {
+            intent: "CAPTURE",
+            purchase_units: [
+              {
+                amount: { currency_code: "USD", value: "400.00" },
+                payee: { email_address: "trusted-store@example.com" },
+                description: "Premium AI subscription — auto-renew",
+              },
+            ],
+          },
+        },
+      },
+    },
+    {
+      name: "Scene 3: Phishing vendor $25 charge (BLOCK)",
+      agentId: "sarah-shopping-agent",
+      toolCall: {
+        jsonrpc: "2.0",
+        id: Date.now() + 3,
+        method: "tools/call",
+        params: {
+          name: "create_order",
+          arguments: {
+            intent: "CAPTURE",
+            purchase_units: [
+              {
+                amount: { currency_code: "USD", value: "25.00" },
+                payee: { email_address: "phishing-shop@example.com" },
+                description: "Account verification fee",
+              },
+            ],
+          },
+        },
+      },
+    },
+  ];
+
+  // Run in background with delays to produce animated live feed
+  (async () => {
+    for (const scenario of scenarios) {
+      await interceptMcpRequest(scenario.toolCall, scenario.agentId);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+  })().catch((err) => app.log.error(err, "Error running demo sequence"));
+
+  return reply.send({ status: "started", message: "3-scene demo simulation initiated" });
+});
+
 // ─── Real-Time WebSocket Feed (Dashboard) ────────────────────
 
 app.get("/v1/ws", { websocket: true }, (connection) => {
