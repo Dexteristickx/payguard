@@ -15,7 +15,7 @@ export interface TransactionAlertData {
 
 export function formatAlertMessage(data: TransactionAlertData): string {
   const rulesList = data.policyResult.triggeredRules.length
-    ? data.policyResult.triggeredRules.map((r) => `  • ⚠️ ${r}`).join("\n")
+    ? data.policyResult.triggeredRules.map((r) => `  • ⚠️ \`${r}\``).join("\n")
     : "  • None";
 
   return `🛡️ *PAYGUARD SECURITY ALERT*

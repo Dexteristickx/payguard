@@ -21,6 +21,7 @@ PayGuard is an Agentic Spending Firewall for PayPal MCP built for the PayPal AI 
 - [x] Block 4C: OpenAPI 3.0.3 spec (`/v1/openapi.json`) & `@payguard/sdk` client package scaffolded and compiled
 - [x] Block 4D: Prepare 5 Judge Q&A responses, 72-hour countdown checklist & execution playbook
 - [x] Full System Audit & Hardening: Fixed multi-run demo velocity poisoning, added 1-click Reset button (`/v1/demo/reset`), restored `Triggered Policies` column in AG Grid, eliminated `approvalId` event race condition, and added `packages/proxy/Dockerfile`
+- [x] Configure Live Telegram Bot Credentials (`TELEGRAM_BOT_TOKEN` & `TELEGRAM_CHAT_ID`) in `.env` (`@PayGuardSecurityFirewall_bot` connected & verified live push notifications to chat `1687104858`)
 - [/] Final Polish: Record 2.5-min demo video, capture dashboard screenshots/GIFs, and submit to Devpost
 
 ## Key Files & Recent Modifications
