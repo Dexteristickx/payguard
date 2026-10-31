@@ -28,6 +28,14 @@ function recordTransaction(agentId: string, timestamp: number): void {
   agentTransactionLog.set(agentId, log);
 }
 
+export function resetAgentVelocity(agentId?: string): void {
+  if (agentId) {
+    agentTransactionLog.delete(agentId);
+  } else {
+    agentTransactionLog.clear();
+  }
+}
+
 function getRecentTransactionCount(
   agentId: string,
   now: number,

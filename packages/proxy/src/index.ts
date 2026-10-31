@@ -3,7 +3,9 @@ import cors from "@fastify/cors";
 import websocket from "@fastify/websocket";
 import { config } from "./config.js";
 import { interceptMcpRequest } from "./mcp-interceptor.js";
+import { resetAgentVelocity } from "./policy-engine.js";
 import {
+  clearAllTransactions,
   getAllTransactions,
   resolveApproval,
   subscribe,
@@ -83,7 +85,19 @@ app.get("/v1/transactions", async () => {
 
 // ─── Demo Trigger API (Dashboard 1-Click Demo Mode) ───────────
 
+app.post("/v1/demo/reset", async (request, reply) => {
+  const body = (request.body as { clearLedger?: boolean } | undefined) ?? {};
+  if (body.clearLedger !== false) {
+    clearAllTransactions();
+  }
+  resetAgentVelocity();
+  return reply.send({ status: "reset", message: "Demo state reset" });
+});
+
 app.post("/v1/demo/run", async (_request, reply) => {
+  // Reset velocity for demo agent so repeated runs produce identical 3-act choreography
+  resetAgentVelocity("sarah-shopping-agent");
+
   const scenarios: Array<{
     name: string;
     agentId: string;

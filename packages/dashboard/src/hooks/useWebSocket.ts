@@ -92,6 +92,20 @@ export function useWebSocket() {
     }
   };
 
+  const resetDemoState = useCallback(async () => {
+    try {
+      await fetch("/v1/demo/reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clearLedger: true }),
+      });
+      setTransactions([]);
+      setEvents([]);
+    } catch (e) {
+      console.error("Failed to reset demo state:", e);
+    }
+  }, []);
+
   return {
     transactions,
     events,
@@ -100,6 +114,7 @@ export function useWebSocket() {
     eventCount: events.length,
     refetch: fetchTransactions,
     resolveApproval,
+    resetDemoState,
   };
 }
 

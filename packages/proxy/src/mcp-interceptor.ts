@@ -209,11 +209,7 @@ export async function interceptMcpRequest(
   }
 
   // ── HOLD: Queue for human approval ──
-  transactionRecord.status = "HELD";
-  recordTransaction(transactionRecord);
-
-  // Queue approval request
-  const approvalPromise = createApprovalRequest(transactionId);
+  const approvalPromise = createApprovalRequest(transactionRecord);
 
   // Background resolution hook
   approvalPromise.then(async (approved) => {

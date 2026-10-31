@@ -103,6 +103,35 @@ export function TransactionGrid({ transactions }: Props) {
         ),
       },
       {
+        headerName: "Triggered Policies",
+        field: "policyResult.triggeredRules",
+        flex: 1.2,
+        minWidth: 200,
+        cellRenderer: (params: { data: TransactionRecord }) => {
+          const rules = params.data?.policyResult?.triggeredRules ?? [];
+          if (rules.length === 0) {
+            return (
+              <span className="text-[11px] font-mono text-emerald-400/70">
+                ✓ Clean pass
+              </span>
+            );
+          }
+          return (
+            <div className="flex flex-wrap items-center gap-1">
+              {rules.map((rule, i) => (
+                <span
+                  key={i}
+                  title={rule}
+                  className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/25 truncate max-w-[220px]"
+                >
+                  ⚠️ {rule.split(":")[0]}
+                </span>
+              ))}
+            </div>
+          );
+        },
+      },
+      {
         headerName: "Actions",
         width: 180,
         cellRenderer: (params: { data: TransactionRecord }) => {

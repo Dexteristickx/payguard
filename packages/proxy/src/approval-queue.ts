@@ -62,14 +62,28 @@ export function getAllTransactions(): TransactionRecord[] {
   );
 }
 
+export function clearAllTransactions(): void {
+  for (const pending of pendingApprovals.values()) {
+    clearTimeout(pending.timeout);
+  }
+  pendingApprovals.clear();
+  transactionLog.clear();
+}
+
 // ─── Approval Queue ──────────────────────────────────────────
 
 const APPROVAL_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
 export function createApprovalRequest(
-  transactionId: string
+  record: TransactionRecord
 ): Promise<boolean> {
   const approvalId = randomUUID().slice(0, 8);
+  const transactionId = record.id;
+
+  // Attach approvalId before recording/emitting so UI has it immediately on first render
+  record.approvalId = approvalId;
+  record.status = "HELD";
+  recordTransaction(record);
 
   return new Promise<boolean>((resolve) => {
     const timeout = setTimeout(() => {
@@ -85,17 +99,10 @@ export function createApprovalRequest(
       timeout,
     });
 
-    // Update transaction record with approval ID
-    const record = transactionLog.get(transactionId);
-    if (record) {
-      record.approvalId = approvalId;
-      record.status = "HELD";
-    }
-
     emit({
       type: "APPROVAL_REQUESTED",
       timestamp: Date.now(),
-      data: record!,
+      data: record,
     });
   });
 }

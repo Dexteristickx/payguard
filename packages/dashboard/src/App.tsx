@@ -6,12 +6,12 @@ import { useWebSocket } from "./hooks/useWebSocket";
 import { useStats } from "./hooks/useStats";
 
 export default function App() {
-  const { transactions, connected, eventCount } = useWebSocket();
+  const { transactions, connected, eventCount, resetDemoState } = useWebSocket();
   const stats = useStats(transactions);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#060913] text-slate-100 ambient-glow selection:bg-blue-500/30">
-      <Header connected={connected} eventCount={eventCount} />
+      <Header connected={connected} eventCount={eventCount} onReset={resetDemoState} />
 
       <main className="flex-1 flex flex-col p-4 md:p-6 space-y-5 max-w-[1700px] w-full mx-auto min-h-0">
         {/* Metric Cards Row */}

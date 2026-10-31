@@ -98,6 +98,17 @@ async function runDemo() {
   console.log("\n🛡️  PayGuard Demo — Starting\n");
   console.log("═".repeat(60));
 
+  // Reset demo velocity window so repeated runs produce identical 3-act choreography
+  try {
+    await fetch("http://localhost:3100/v1/demo/reset", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clearLedger: false }),
+    });
+  } catch {
+    // ignore if server not up yet
+  }
+
   for (const scenario of scenarios) {
     console.log(`\n${scenario.name}`);
     console.log("─".repeat(60));

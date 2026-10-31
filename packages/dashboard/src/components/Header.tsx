@@ -3,9 +3,10 @@ import { useState } from "react";
 interface Props {
   connected: boolean;
   eventCount: number;
+  onReset?: () => void;
 }
 
-export function Header({ connected }: Props) {
+export function Header({ connected, onReset }: Props) {
   const [demoRunning, setDemoRunning] = useState(false);
 
   const handleRunDemo = async () => {
@@ -67,6 +68,19 @@ export function Header({ connected }: Props) {
           <span>•</span>
           <span className="text-blue-400">PayPal Sandbox</span>
         </div>
+
+        {/* Reset Ledger Button */}
+        {onReset && (
+          <button
+            onClick={onReset}
+            disabled={demoRunning}
+            title="Clear transaction ledger & reset velocity counters"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-300 bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+          >
+            <span>↺</span>
+            <span className="hidden sm:inline">Reset</span>
+          </button>
+        )}
 
         {/* Hero Demo Trigger Button */}
         <button
