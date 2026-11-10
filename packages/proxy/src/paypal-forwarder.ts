@@ -72,6 +72,17 @@ export async function createPayPalOrder(
     };
   }
 
+  // Create order payload for PayPal Orders v2 API.
+  // Note: Omit `payee.email_address` when sending to live PayPal Sandbox so any
+  // standard developer sandbox account works without needing pre-configured multi-party merchant emails.
+  const sanitizedPayload: PayPalCreateOrderRequest = {
+    intent: orderRequest.intent,
+    purchase_units: orderRequest.purchase_units.map((u) => ({
+      amount: u.amount,
+      ...(u.description ? { description: u.description } : {}),
+    })),
+  };
+
   const response = await fetch(
     `${config.PAYPAL_BASE_URL}/v2/checkout/orders`,
     {
@@ -81,7 +92,7 @@ export async function createPayPalOrder(
         "Content-Type": "application/json",
         "PayPal-Request-Id": randomUUID(),
       },
-      body: JSON.stringify(orderRequest),
+      body: JSON.stringify(sanitizedPayload),
     }
   );
 
