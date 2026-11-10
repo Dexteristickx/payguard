@@ -16,3 +16,4 @@ RUN pnpm --filter @payguard/proxy build
 EXPOSE 3100
 
 CMD ["node", "packages/proxy/dist/index.js"]
+

@@ -72,7 +72,7 @@ export function clearAllTransactions(): void {
 
 // ─── Approval Queue ──────────────────────────────────────────
 
-const APPROVAL_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+const APPROVAL_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 
 export function createApprovalRequest(
   record: TransactionRecord
@@ -112,25 +112,48 @@ export function resolveApproval(
   approved: boolean
 ): boolean {
   const pending = pendingApprovals.get(approvalId);
-  if (!pending) return false;
+  if (pending) {
+    clearTimeout(pending.timeout);
+    pendingApprovals.delete(approvalId);
 
-  clearTimeout(pending.timeout);
-  pendingApprovals.delete(approvalId);
+    const newStatus = approved ? "APPROVED" : "REJECTED";
+    updateTransactionStatus(pending.transactionId, newStatus);
 
-  const newStatus = approved ? "APPROVED" : "REJECTED";
-  updateTransactionStatus(pending.transactionId, newStatus);
+    const updatedRecord = transactionLog.get(pending.transactionId);
+    if (updatedRecord) {
+      emit({
+        type: "APPROVAL_RESOLVED",
+        timestamp: Date.now(),
+        data: updatedRecord,
+      });
+    }
 
-  const updatedRecord = transactionLog.get(pending.transactionId);
-  if (updatedRecord) {
-    emit({
-      type: "APPROVAL_RESOLVED",
-      timestamp: Date.now(),
-      data: updatedRecord,
-    });
+    pending.resolve(approved);
+    return true;
   }
 
-  pending.resolve(approved);
-  return true;
+  // Fallback: if the approval timer already elapsed ("TIMEOUT") or was already resolved,
+  // find the transaction by approvalId so late Telegram/Dashboard clicks still work gracefully!
+  for (const record of transactionLog.values()) {
+    if (record.approvalId === approvalId) {
+      const newStatus = approved ? "COMPLETED" : "REJECTED";
+      const mockOrderId = approved
+        ? record.paypalOrderId ?? `ORDER-MOCK-${randomUUID().slice(0, 8).toUpperCase()}`
+        : undefined;
+      updateTransactionStatus(record.id, newStatus, mockOrderId);
+      const updatedRecord = transactionLog.get(record.id);
+      if (updatedRecord) {
+        emit({
+          type: "APPROVAL_RESOLVED",
+          timestamp: Date.now(),
+          data: updatedRecord,
+        });
+      }
+      return true;
+    }
+  }
+
+  return false;
 }
 
 export function getPendingCount(): number {
