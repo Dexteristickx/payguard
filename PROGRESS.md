@@ -24,7 +24,8 @@ PayGuard is an Agentic Spending Firewall for PayPal MCP built for the PayPal AI 
 - [x] Configure Live Telegram Bot Credentials (`TELEGRAM_BOT_TOKEN` & `TELEGRAM_CHAT_ID`) in `.env` (`@PayGuardSecurityFirewall_bot` connected, extended approval TTL to 30m + late-approval fallback in `approval-queue.ts`)
 - [x] Hackathon Compliance Audit: Added root `LICENSE` (MIT) for GitHub About section requirement and updated `paypal-forwarder.ts` to sanitize `payee` for live PayPal Sandbox API compatibility
 - [x] Connect & Verify Live PayPal Sandbox Credentials (`PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` in `.env` verified creating real PayPal Sandbox Order `9DA42187XJ743144F` via `https://api-m.sandbox.paypal.com/v2/checkout/orders`)
-- [/] Final Polish: Push to public GitHub repo, record 2.5-min demo video, and submit to Devpost
+- [x] Push Public Open-Source Repository to GitHub (`https://github.com/Dexteristickx/payguard` with root `LICENSE` visible in About section and `.env` safely ignored)
+- [/] Final Polish: Record 2.5-min demo video, upload to YouTube, and submit to Devpost
 
 ## Key Files & Recent Modifications
 - `packages/dashboard/`: Upgraded to modern glassmorphism UI with ambient mesh background
